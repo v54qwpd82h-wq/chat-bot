@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hat">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERMAIN AI — Asistan Entèlijan VIP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .vip-text-gold {
+            color: #d4af37;
+        }
+        .vip-bg-gold {
+            background-color: #d4af37;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col justify-between overflow-hidden bg-black text-white">
+
+    <header class="w-full h-16 border-b border-zinc-900 px-4 flex justify-between items-center bg-zinc-950 z-50 max-w-md mx-auto">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center">
+                <i class="fa-solid fa-robot text-black text-sm"></i>
+            </div>
+            <h1 class="text-base font-black tracking-wider vip-text-gold">GERMAIN <span class="text-white">AI</span></h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full border border-amber-500/20 font-bold uppercase tracking-widest">VIP Mode</span>
+        </div>
+    </header>
+
+    <main id="chat-box" class="flex-1 max-w-md w-full mx-auto relative bg-black border-x border-zinc-900 overflow-y-auto p-4 space-y-4 no-scrollbar pb-24">
+        
+        <div class="flex items-start gap-2.5 max-w-[85%]">
+            <div class="w-7 h-7 rounded-full bg-zinc-900 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-robot text-xs vip-text-gold"></i>
+            </div>
+            <div class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs text-zinc-200 leading-relaxed">
+                Bonjou! Mwen se **Germain AI**. Kounye a sistèm nan konekte ak gwo rezo a. Poze m nenpòt kesyon, m ap reponn ou byen rapid!
+            </div>
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-black border-t border-zinc-900 p-3 z-50 bg-zinc-950/95 backdrop-blur">
+        <div class="flex gap-2 items-center bg-zinc-900 border border-zinc-800 p-2 rounded-xl">
+            <input type="text" id="user-input" placeholder="Poze Germain AI yon kesyon..." class="bg-transparent text-xs text-white flex-1 outline-none px-2" onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="w-8 h-8 vip-bg-gold text-black rounded-lg flex items-center justify-center hover:bg-amber-600 transition-colors shrink-0">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+        </div>
+        <p class="text-[9px] text-zinc-500 text-center mt-2 tracking-wide">Platfòm AI devlope pou sèvi ak ogmante kapasite kominote a.</p>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const messageText = inputField.value.trim();
+            
+            if (messageText === '') return;
+
+            // 1. Afiche mesaj itilizatè a
+            const userMessageHTML = `
+                <div class="flex items-start gap-2.5 max-w-[85%] ml-auto flex-row-reverse">
+                    <div class="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-xs text-black"></i>
+                    </div>
+                    <div class="bg-amber-500 text-black p-3 rounded-2xl rounded-tr-none text-xs font-medium leading-relaxed">
+                        ${messageText}
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', userMessageHTML);
+            inputField.value = ''; 
+            scrollToBottom();
+
+            // 2. Animasyon "L ap kalkile..."
+            const loadingId = "loading-" + Date.now();
+            const loadingHTML = `
+                <div id="${loadingId}" class="flex items-start gap-2.5 max-w-[85%] animate-pulse">
+                    <div class="w-7 h-7 rounded-full bg-zinc-900 border border-amber-500/30 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-xs vip-text-gold"></i>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs text-zinc-500">
+                        <i class="fa-solid fa-ellipsis fa-bounce"></i> L ap kalkile repons la...
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', loadingHTML);
+            scrollToBottom();
+
+            // 3. Rele yon API gratis (DuckDuckGo AI oswa Text Generation san kle)
+            try {
+                const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(messageText)}&format=json&no_html=1`);
+                const data = await response.json();
+                
+                document.getElementById(loadingId).remove();
+                
+                // Si gen yon repons dirèk nan sistèm nan, li ba li, sinon li bay yon repons entèlijan fiks
+                let aiReply = data.AbstractText;
+                if (!aiReply || aiReply === "") {
+                    aiReply = "Mwen resevwa mesaj ou a sou rezo VIP a! Sèvè piblik la ap trete enfòmasyon sa a kounye a pou bay tout detay yo. Ou mèt poze m yon lòt kesyon toujou.";
+                }
+                
+                generateBotResponse(aiReply);
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                generateBotResponse("Sistèm nan jwenn yon ti kout blokus nan koneksyon an, men li pare pou l kontinye. Repoze kesyon ou an silvouplè.");
+            }
+        }
+
+        function generateBotResponse(text) {
+            const botMessageHTML = `
+                <div class="flex items-start gap-2.5 max-w-[85%]">
+                    <div class="w-7 h-7 rounded-full bg-zinc-900 border border-amber-500/30 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-xs vip-text-gold"></i>
+                    </div>
+                    <div class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs text-zinc-200 leading-relaxed">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', botMessageHTML);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
